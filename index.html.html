@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>편안한 수도쿠</title>
+<style>
+:root{--bg:#EDF1EF;--card:#F8FAF9;--ink:#22343C;--line:#9DB1B3;--thick:#4A6670;--mine:#2F6A7A;--sel:#CFE3E6;--same:#DDE8D8;--wrong:#F0D5CE;--hintc:#EFE3BE;--btn:#3E5C68;--btnink:#F8FAF9;--pad:#DCE5E5;--good:#436B5A;--goodink:#F8FAF9;--star:#D2B565;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16212A;--card:#1D2B35;--ink:#E8EEEC;--line:#4D6670;--thick:#9DB8BF;--mine:#8CC4D0;--sel:#2E4A57;--same:#2F4538;--wrong:#563B38;--hintc:#554B2E;--btn:#9CBAC2;--btnink:#13202A;--pad:#263842;--good:#8FBBA3;--goodink:#10211A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16212A;--card:#1D2B35;--ink:#E8EEEC;--line:#4D6670;--thick:#9DB8BF;--mine:#8CC4D0;--sel:#2E4A57;--same:#2F4538;--wrong:#563B38;--hintc:#554B2E;--btn:#9CBAC2;--btnink:#13202A;--pad:#263842;--good:#8FBBA3;--goodink:#10211A;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--gw:min(calc(100vw - 24px),480px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;padding:12px 12px 140px;display:flex;flex-direction:column;align-items:center}
+button{font-family:inherit;cursor:pointer}
+.top{width:var(--gw);display:flex;align-items:center;justify-content:space-between}
+.nav{width:60px;height:60px;border:0;border-radius:16px;background:var(--pad);color:var(--ink);font-size:1.6rem;font-weight:800}
+.nav:disabled{opacity:.3;cursor:default}
+.lv{text-align:center}.lv b{display:block;font-size:2rem;line-height:1.2}.lv span{font-size:1.1rem;opacity:.85}
+.rule{width:var(--gw);font-size:1.1rem;line-height:1.5;text-align:center;margin:8px 0 10px}
+.grid{width:var(--gw);height:var(--gw);display:grid;grid-template-columns:repeat(var(--n),1fr);grid-template-rows:repeat(var(--n),1fr);border:3px solid var(--thick);background:var(--card);border-radius:8px;overflow:hidden}
+.c{display:flex;align-items:center;justify-content:center;font-size:calc(var(--gw)/var(--n)*.58);font-weight:600;color:var(--mine);border:0 solid var(--line);border-right-width:1px;border-bottom-width:1px;cursor:pointer;user-select:none}
+.c.g{color:var(--ink);font-weight:800}
+.c.rb{border-right:3px solid var(--thick)}.c.bb{border-bottom:3px solid var(--thick)}
+.c.lc{border-right-width:0}.c.lr{border-bottom-width:0}
+.c.same{background:var(--same)}.c.hint{background:var(--hintc)}
+.c.sel{background:var(--sel);box-shadow:inset 0 0 0 4px var(--thick)}
+.c.bad{background:var(--wrong)}
+.msg{width:var(--gw);min-height:5.2em;margin:12px 0 10px;padding:12px 16px;border-radius:16px;background:var(--pad);font-size:1.3rem;line-height:1.5;text-align:center;display:flex;align-items:center;justify-content:center}
+.msg.good{color:var(--good);font-weight:800}
+.pad{width:var(--gw);display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pad button{height:68px;font-size:2.1rem;font-weight:800;border:0;border-radius:16px;background:var(--btn);color:var(--btnink)}
+.pad .del{font-size:1.25rem;background:var(--pad);color:var(--ink)}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:2px solid var(--line);display:flex;justify-content:center;z-index:5}
+.hintbtn{width:100%;max-width:480px;min-height:76px;border:0;border-radius:18px;background:var(--good);color:var(--goodink);font-size:1.6rem;font-weight:800;line-height:1.3}
+.hintbtn small{display:block;font-size:1.05rem;font-weight:500}
+.ov{position:fixed;inset:0;background:rgba(18,30,38,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:20;overflow:hidden}
+.ov.on{display:flex}
+.card{position:relative;background:var(--card);border-radius:26px;padding:30px 22px;max-width:420px;width:100%;text-align:center}
+.card h2{font-size:2.2rem;margin:4px 0 12px}.card p{font-size:1.35rem;line-height:1.55;margin:0 0 22px}
+.card button{width:100%;min-height:72px;border:0;border-radius:18px;background:var(--good);color:var(--goodink);font-size:1.6rem;font-weight:800}
+.big{font-size:3.2rem;color:var(--star)}
+.st{position:absolute;top:-40px;font-size:1.7rem;color:var(--star);animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(160deg)}}
+@media (prefers-reduced-motion:reduce){.st{display:none}}
+button:focus-visible,.c:focus-visible{outline:4px solid var(--thick);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="top">
+  <button class="nav" id="prev" aria-label="이전 단계">◀</button>
+  <div class="lv"><b id="lvn">1단계</b><span id="lvs"></span></div>
+  <button class="nav" id="next" aria-label="다음 단계">▶</button>
+</div>
+<div class="rule" id="rule"></div>
+<div class="grid" id="grid"></div>
+<div class="msg" id="msg" aria-live="polite"></div>
+<div class="pad" id="pad"></div>
+<div class="bar"><button class="hintbtn" id="hint">힌트 보기<small>어려우면 눌러 보세요. 정답을 알려 드려요</small></button></div>
+<div class="ov" id="ov"><div class="card"><div class="big">★</div><h2 id="wt"></h2><p id="wp"></p><button id="wb"></button></div></div>
+<script>
+const LV=[[4,3],[4,4],[4,5],[4,6],[4,7],[4,8],[6,8],[6,10],[6,12],[6,14],[6,16],[6,18],[6,20],[6,22],[9,18],[9,21],[9,24],[9,27],[9,30],[9,33],[9,36],[9,39],[9,42],[9,44],[9,46],[9,48]];
+const CF={4:[2,2],6:[2,3],9:[3,3]};
+const NAME={4:"아주 쉬운 작은 판",6:"쉬운 중간 판",9:"기본 판"};
+const SHORT=["맞아요! 잘하셨어요!","좋습니다!","정확해요!","훌륭해요!","대단하세요!","아주 잘 찾으셨어요!","척척 하시네요!"];
+const WT=["참 잘하셨어요!","정말 대단하세요!","훌륭합니다!","멋지게 해내셨어요!","최고예요!"];
+const WP=["끝까지 차분히 해내신 모습이 정말 멋집니다.","집중력이 대단하세요. 박수를 보내 드립니다!","한 칸 한 칸 정성껏 채우셨네요.","오늘도 머리가 쑥쑥 건강해지셨어요!","자랑스러워하셔도 좋습니다!"];
+const $=id=>document.getElementById(id);
+const pick=a=>a[Math.random()*a.length|0];
+const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let N,BR,BC,sol,cur,fixed,hintd,sel=-1,level=1,unlocked=1;
+try{const s=JSON.parse(localStorage.getItem("sdk")||"{}");unlocked=s.u||1;level=Math.min(s.l||1,unlocked)}catch(e){}
+function save(){try{localStorage.setItem("sdk",JSON.stringify({u:unlocked,l:level}))}catch(e){}}
+function ok(g,i,v){const r=i/N|0,c=i%N;for(let k=0;k<N;k++)if(g[r*N+k]===v||g[k*N+c]===v)return false;const r0=r-r%BR,c0=c-c%BC;for(let a=0;a<BR;a++)for(let b=0;b<BC;b++)if(g[(r0+a)*N+c0+b]===v)return false;return true}
+function fill(g,i){if(i===N*N)return true;for(const v of sh([...Array(N)].map((_,k)=>k+1)))if(ok(g,i,v)){g[i]=v;if(fill(g,i+1))return true;g[i]=0}return false}
+function cnt(g,lim){let b=-1,bl=null;for(let i=0;i<N*N;i++)if(!g[i]){const l=[];for(let v=1;v<=N;v++)if(ok(g,i,v))l.push(v);if(!bl||l.length<bl.length){b=i;bl=l;if(!l.length)return 0}}if(b<0)return 1;let t=0;for(const v of bl){g[b]=v;t+=cnt(g,lim);if(t>=lim)break}g[b]=0;return t}
+function msg(t,k){$("msg").textContent=t;$("msg").className="msg"+(k?" "+k:"")}
+function build(){
+  const [n,blanks]=LV[level-1];N=n;[BR,BC]=CF[n];
+  sol=Array(N*N).fill(0);fill(sol,0);
+  const p=sol.slice();let rem=0;
+  for(const i of sh([...Array(N*N).keys()])){if(rem>=blanks)break;const v=p[i];p[i]=0;if(cnt(p,2)===1)rem++;else p[i]=v}
+  cur=p;fixed=p.map(v=>v>0);hintd=new Set();sel=-1;
+  const g=$("grid");g.style.setProperty("--n",N);g.innerHTML="";
+  for(let i=0;i<N*N;i++){const r=i/N|0,c=i%N;let b="c";
+    if(c===N-1)b+=" lc";else if((c+1)%BC===0)b+=" rb";
+    if(r===N-1)b+=" lr";else if((r+1)%BR===0)b+=" bb";
+    const e=document.createElement("div");e.dataset.b=b;e.dataset.i=i;e.setAttribute("role","button");g.appendChild(e)}
+  const pd=$("pad");pd.innerHTML="";
+  for(let v=1;v<=N;v++){const b=document.createElement("button");b.textContent=v;b.dataset.v=v;pd.appendChild(b)}
+  const d=document.createElement("button");d.textContent="지우기";d.className="del";d.dataset.v=0;pd.appendChild(d);
+  $("lvn").textContent=level+"단계";$("lvs").textContent=NAME[N];
+  $("rule").textContent="가로줄과 세로줄, 굵은 선 네모 칸 안에 1부터 "+N+"까지 숫자가 한 번씩만 들어가요.";
+  $("prev").disabled=level<=1;$("next").disabled=level>=unlocked;
+  paint();
+  msg(level>1&&LV[level-1][0]!==LV[level-2][0]?"이제 조금 더 큰 판이에요. 천천히 하셔도 괜찮아요.":"빈 칸을 눌러 보세요. 그다음 아래 숫자를 눌러 주세요. 막히면 맨 아래 ‘힌트’ 버튼을 눌러요.");
+}
+function paint(){
+  const cs=$("grid").children,sv=sel>=0?cur[sel]:0;
+  for(let i=0;i<N*N;i++){const e=cs[i],v=cur[i];e.textContent=v||"";let c=e.dataset.b;
+    if(fixed[i])c+=" g";
+    if(i===sel)c+=" sel";else if(v&&v===sv)c+=" same";
+    if(v&&!fixed[i]&&v!==sol[i])c+=" bad";
+    if(hintd.has(i))c+=" hint";
+    e.className=c}
+}
+function check(){if(cur.every((v,i)=>v===sol[i]))setTimeout(win,700)}
+function put(v){
+  if(sel<0){msg("먼저 빈 칸을 눌러 주세요.");return}
+  if(fixed[sel]){msg("이 칸은 처음부터 채워져 있어요. 빈 칸을 눌러 주세요.");return}
+  cur[sel]=v;paint();
+  if(!v){msg("지웠어요. 다시 천천히 해 보세요.");return}
+  if(v===sol[sel]){msg(pick(SHORT),"good");check()}
+  else msg("조금 달라요. 괜찮아요, 다른 숫자를 눌러 보세요. 어려우면 아래 힌트를 눌러 보세요.");
+}
+function hint(){
+  let i=(sel>=0&&cur[sel]!==sol[sel])?sel:-1;
+  if(i<0){const o=[...cur.keys()].filter(k=>cur[k]!==sol[k]);if(!o.length)return;i=pick(o)}
+  sel=i;cur[i]=sol[i];fixed[i]=true;hintd.add(i);paint();
+  msg("힌트예요! "+((i/N|0)+1)+"번째 줄 "+(i%N+1)+"번째 칸의 정답은 "+sol[i]+"입니다. 잘 하고 계세요!","good");
+  check();
+}
+function stars(){const o=$("ov");o.querySelectorAll(".st").forEach(e=>e.remove());
+  for(let i=0;i<16;i++){const s=document.createElement("span");s.className="st";s.textContent="★";s.style.left=Math.random()*96+"%";s.style.animationDuration=(4+Math.random()*4)+"s";s.style.animationDelay=(Math.random()*2)+"s";o.appendChild(s)}}
+function win(){
+  const last=level>=LV.length;
+  if(!last&&level+1>unlocked)unlocked=level+1;
+  save();
+  $("wt").textContent=pick(WT);
+  $("wp").textContent=level+"단계를 완성하셨어요. "+pick(WP)+(last?" 모든 단계를 마치셨습니다!":"");
+  $("wb").textContent=last?"한 번 더 해보기":"다음 단계로 ▶";
+  stars();$("ov").classList.add("on");
+}
+function go(l){level=Math.max(1,Math.min(l,LV.length));save();build()}
+$("grid").addEventListener("click",e=>{const t=e.target.closest(".c");if(!t)return;sel=+t.dataset.i;paint();
+  if(fixed[sel])msg("이 칸은 이미 채워져 있어요. 같은 숫자는 색이 달라져요.");else msg("이제 아래 숫자를 눌러 주세요.")});
+$("pad").addEventListener("click",e=>{const b=e.target.closest("button");if(b)put(+b.dataset.v)});
+$("hint").onclick=hint;
+$("prev").onclick=()=>go(level-1);
+$("next").onclick=()=>go(level+1);
+$("wb").onclick=()=>{$("ov").classList.remove("on");go(level>=LV.length?level:level+1)};
+build();
+</script>
+</body>
+</html>
